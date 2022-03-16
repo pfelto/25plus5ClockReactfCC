@@ -9,23 +9,38 @@ function LengthComponent({ status, title, length, handleClick }) {
   const isACTIVE = status === STATUS.ACTIVE;
 
   return (
-    <div>
-      <h2 id={`${title.toLowerCase()}-label`}>{title} Length</h2>
-      <button
-        id={`${title.toLowerCase()}-decrement`}
-        onClick={() => handleClick(-1, title)}
-        disabled={isACTIVE}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <h2 id={`${title.toLowerCase()}-label`} style={{ textAlign: "center" }}>
+        {title} Length
+      </h2>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-evenly",
+          alignItems: "center",
+        }}
       >
-        decrement
-      </button>
-      <p id={`${title.toLowerCase()}-length`}>{length}</p>
-      <button
-        id={`${title.toLowerCase()}-increment`}
-        onClick={() => handleClick(1, title)}
-        disabled={isACTIVE}
-      >
-        increment
-      </button>
+        <button
+          id={`${title.toLowerCase()}-decrement`}
+          onClick={() => handleClick(-1, title)}
+          disabled={isACTIVE}
+        >
+          -
+        </button>
+        <p id={`${title.toLowerCase()}-length`}>{length}</p>
+        <button
+          id={`${title.toLowerCase()}-increment`}
+          onClick={() => handleClick(1, title)}
+          disabled={isACTIVE}
+        >
+          +
+        </button>
+      </div>
     </div>
   );
 }
@@ -35,10 +50,16 @@ function SessionClock({ title, length }) {
   let seconds = length - minutes * 60;
   let formattedMin = ("0" + minutes).slice(-2);
   let formattedSeconds = ("0" + seconds).slice(-2);
+
+  let timeleftStyle = { textAlign: "center", border: "1px solid black" };
+  if (length <= 60) {
+    timeleftStyle.color = "red";
+    timeleftStyle.border = "1px solid red";
+  }
   return (
-    <div>
+    <div style={{ alignSelf: "center" }}>
       <h2 id="timer-label">{title}</h2>
-      <p id="time-left">
+      <p id="time-left" style={timeleftStyle}>
         {formattedMin}:{formattedSeconds}
       </p>
       <audio
@@ -103,51 +124,81 @@ function App() {
   }
 
   return (
-    <div>
-      <h1>25 + 5 Clock</h1>
-      <LengthComponent
-        status={status}
-        title="Break"
-        length={breakLength}
-        handleClick={handleClick}
-      />
-      <LengthComponent
-        status={status}
-        title="Session"
-        length={sessionLength}
-        handleClick={handleClick}
-      />
-      {status === STATUS.idle || timer.id === "Session" ? (
-        <SessionClock title={timer.id} length={timer.length} />
-      ) : (
-        <SessionClock title={timer.id} length={timer.length} />
-      )}
-      <button
-        id="start_stop"
-        onClick={() => {
-          if (status === STATUS.IDLE) setStatus(STATUS.ACTIVE);
-          else setStatus(STATUS.IDLE);
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        backgroundColor: "lightgray",
+        border: "1px solid black",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          border: "1px solid black",
+          borderRadius: "10px",
+          backgroundColor: "lavender",
+          width: "50vw",
+          padding: "5px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
         }}
       >
-        {status === STATUS.IDLE ? "play" : "stop"}
-      </button>
-      <button
-        id="reset"
-        onClick={() => {
-          //if audio is playing. Stop it and set currentTime to 0
-          const sound = document.getElementById("beep");
-          if (!sound.paused) {
-            sound.pause();
-            sound.currentTime = 0;
-          }
-          setSessionLength(25);
-          setBreakLength(5);
-          setTimer({ id: "Session", length: 25 * 60 });
-          setStatus(STATUS.IDLE);
-        }}
-      >
-        reset
-      </button>
+        <h1 style={{ textAlign: "center" }}>25 + 5 Clock</h1>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-around",
+          }}
+        >
+          <LengthComponent
+            status={status}
+            title="Break"
+            length={breakLength}
+            handleClick={handleClick}
+          />
+          <LengthComponent
+            status={status}
+            title="Session"
+            length={sessionLength}
+            handleClick={handleClick}
+          />
+        </div>
+
+        <SessionClock title={timer.id} length={timer.length} />
+
+        <div style={{ alignSelf: "center", marginBottom: "5px" }}>
+          <button
+            id="start_stop"
+            onClick={() => {
+              if (status === STATUS.IDLE) setStatus(STATUS.ACTIVE);
+              else setStatus(STATUS.IDLE);
+            }}
+          >
+            {status === STATUS.IDLE ? "play" : "stop"}
+          </button>
+          <button
+            id="reset"
+            onClick={() => {
+              //if audio is playing. Stop it and set currentTime to 0
+              const sound = document.getElementById("beep");
+              if (!sound.paused) {
+                sound.pause();
+                sound.currentTime = 0;
+              }
+              setSessionLength(25);
+              setBreakLength(5);
+              setTimer({ id: "Session", length: 25 * 60 });
+              setStatus(STATUS.IDLE);
+            }}
+          >
+            reset
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
